@@ -1,8 +1,6 @@
 lpath <- '/srv/R_library'
 .libPaths(c(lpath, .libPaths()))
 
-# setwd("C:/Users/nhy577/Documents/_toma/Rmisc/Reproducibility/SampleServerShinyWeighted")
-
 load("shinyReprothon.RData")
 
 # Row identifier

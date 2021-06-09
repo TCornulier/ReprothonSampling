@@ -1,7 +1,9 @@
 setwd("C:/Users/nhy577/Documents/_toma/Rmisc/Reproducibility/ReprothonSampling")
 
-po<- read.delim("Posts_reduced_2021-03.txt")
+po<- read.delim("Posts_reduced_2021-03.txt") 
+# comes from https://aberdeenstudygroup.github.io/studyGroup/Reprothon2021/Milestones/data_preprocessing/
 
+# interpret time variables
 po$CDate<- strptime(po$CreationDate, format= "%Y-%m-%dT%H:%M:%OS")
 po$Year<- factor(po$CDate[, "year"] + 1900)
 str(po)
@@ -10,7 +12,7 @@ table(is.na(po$Tags))
 
 tags<- na.exclude(po$Tags)
 
-# convert to a vector for frequency calculation
+# convert tags list to a vector for frequency calculation
 tags.list<- as.relistable(strsplit(tags, split= c("><", "<", ">")))
 tags.vec<- unlist(tags.list)
 # tidy up
@@ -105,10 +107,11 @@ TopMemb.Cols<- grep("Topic", names(po))
 # Topic*Year combinations in long format
 TopYear<- expand.grid(Year= row.names(TopicYear.Freq), Topic= colnames(Topic.Memb), stringsAsFactors= F)
 
-# sampling
+# sampling principle
 	# [1] compute number of questions already sampled in topic*year
 	# [2] compute number of questions *not* yet sampled in topic*year
-	# sample topic*year weighted by ((1 - [1]/max([1])) * ([2] > 0))^2 in order to even out sample size between topic*year until questions are exhausted
+	# sample topic*year weighted by ((1 - [1]/max([1])) * ([2] > 0))^2 in order 
+		# to even out sample size between topic*year until questions are exhausted
 	# for selected topic*year, draw one out of yet unsampled questions
 	# mark question as sampled
 
@@ -125,24 +128,24 @@ TopicYear.Sampled<- function(){
 NA_into_0<- function(x){x[is.na(x)]<- 0; x}
 
 #### export questions that belong to a topic of interest 
-#### (for the Shiny sample server)
+#### for use by the Shiny sample server ("Question generator")
 belong2topics<- apply(po[, TopMemb.Cols], 1, function(x){any(x)})
 
 po<- po[belong2topics, ]
 
 save(TopicYear.Freq, Topic.Memb, po, file= "shinyReprothon.RData")
 
-# when was question last sampled (assume 1970-01-01 00:00:00 UTC if not)
+# when was each question last sampled (assume 1970-01-01 00:00:00 UTC if not)
 Sampled<- rep(0, nrow(po))
 
-zzs <- file("Sampled.txt", "wb")
-writeBin(as.integer(Sampled), zzs, size = 4) # faster way of writing to file
+zzs <- file("SampleServerShinyWeighted/Sampled.txt", "wb")
+writeBin(as.integer(Sampled), zzs, size = 4) # faster way of writing to a file
 close(zzs)
 
 # tmpp<- readBin("Sampled.txt", what= integer(), size= 4, n= file.info("Sampled.txt")$size)
 
 
-#### Now, create a backup file of 5000 random samples in case the server fails when needed
+#### Now, create a backup file of 5000 random samples in case the Shiny server fails when it is needed
 
 # Row identifier
 po$Row<- 1:nrow(po)
@@ -180,7 +183,8 @@ Output<- po$Id[New.Sample]
 
 new.seed<- Output
 
-barplot(NA_into_0(TopicYear.Sampled()), ylim= c(0, 100))
+# show the state of samping graphically
+barplot(NA_into_0(TopicYear.Sampled()), ylim= c(0, 500))
 
 cat(paste0("https://stackoverflow.com/questions/", Output, "/"), file = zz, sep = "\n") # add the new sample to the backup file
 
@@ -192,15 +196,13 @@ close(zz)
 test.dat<- read.csv("BackupRandomSampling.csv")
 str(test.dat)
 
-# For reference, the frequency in the data
+# For reference, the frequency of the topics in the data
 dev.new()
 barplot(NA_into_0(TopicYear.Freq))
 
-str(po)
-
-
-
-
+# The sampler is successful greatly reduced imbalance
+# (within the contraints of the total size of each pool
+# and of the occurence of multiple tags / topics per question)
 
 
 

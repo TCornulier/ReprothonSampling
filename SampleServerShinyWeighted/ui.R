@@ -9,7 +9,7 @@ source('global.R')
 shinyUI(pageWithSidebar(
 
   # Application title
-  titlePanel("REPROTHON 2021 - random sample server"),
+  titlePanel("REPROTHON 2021 - question generator"),
 
   sidebarPanel(
 
@@ -20,11 +20,11 @@ shinyUI(pageWithSidebar(
       br(),
       helpText("\n\n Once you have drawn a new sample, please process the question and enter the outcome in the", a(href= 'https://forms.gle/rT9bkKdV48ChRhjU7', "results form"), "before pressing the button again."),
       hr(),
-      helpText("\n\n For more guidance, check out the How_to_Guide and Tutorials at", a(href= 'https://aberdeenstudygroup.github.io/studyGroup/Reprothon2021/', "https://aberdeenstudygroup.github.io/studyGroup/Reprothon2021/"), "."),
+      helpText("\n\n For more guidance, check out the How_to_Guide and Tutorials at", a(href= 'https://aberdeenstudygroup.github.io/studyGroup/Reprothon2021/', "https://aberdeenstudygroup.github.io/studyGroup/Reprothon2021/")),
       hr(),
       br(),
       hr(),
-      # h6(helpText("\n\n The source code for this app available at [insert link here]"),
+      h6(helpText("\n\n The source code for this app available in this", a(href= 'https://github.com/TCornulier/ReprothonSampling', "GitHub repository"))),
       hr()
 
   ),
